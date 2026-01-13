@@ -3,13 +3,13 @@ import Image from "next/image";
 import BarbershopItem from "@/components/barbershop-item";
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import Footer from "@/components/ui/footer";
 import {
   PageContainer,
   PageSectionContent,
   PageSectionScroller,
   PageSectionTitle,
 } from "@/components/ui/page";
+import QuickSearch from "@/components/ui/quick-search";
 import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
 import banner from "@/public/banner.png";
 
@@ -22,6 +22,7 @@ export default async function Home() {
     <div>
       <Header />
       <PageContainer>
+        <QuickSearch />
         <Image
           src={banner}
           alt="Agende nos melhores com a Aparatus"
