@@ -10,6 +10,7 @@ import {
   PageSectionTitle,
 } from "@/components/ui/page";
 import QuickSearch from "@/components/ui/quick-search";
+import Search from "@/components/ui/search";
 import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
 import banner from "@/public/banner.png";
 
@@ -22,6 +23,7 @@ export default async function Home() {
     <div>
       <Header />
       <PageContainer>
+        <Search />
         <QuickSearch />
         <Image
           src={banner}
