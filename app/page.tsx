@@ -1,12 +1,56 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Image from "next/image";
 
-export default function Home() {
+import BarbershopItem from "@/components/barbershop-item";
+import BookingItem from "@/components/booking-item";
+import Header from "@/components/header";
+import Footer from "@/components/ui/footer";
+import {
+  PageContainer,
+  PageSectionContent,
+  PageSectionScroller,
+  PageSectionTitle,
+} from "@/components/ui/page";
+import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
+import banner from "@/public/banner.png";
+
+// Server Component
+export default async function Home() {
+  // pega todas as barbearias cadastradas
+  const barbershops = await getBarbershops();
+  const popularBarbershops = await getPopularBarbershops();
   return (
-    <div className="flex h-screen flex-col items-center justify-center">
-      <Button variant="destructive">FSW</Button>
-      <Input type="text" placeholder="Enter your name" />
+    <div>
+      <Header />
+      <PageContainer>
+        <Image
+          src={banner}
+          alt="Agende nos melhores com a Aparatus"
+          sizes="100vw"
+          className="h-auto w-full"
+        />
+        <PageSectionContent>
+          {/* Composition Pattern */}
+          <PageSectionTitle>Agendamentos</PageSectionTitle>
+          <BookingItem />
+        </PageSectionContent>
+
+        <PageSectionContent>
+          <PageSectionTitle>Barbearias</PageSectionTitle>
+        </PageSectionContent>
+        <PageSectionScroller>
+          {barbershops.map((barbershop) => (
+            <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+          ))}
+        </PageSectionScroller>
+        <PageSectionContent>
+          <PageSectionTitle>Barbearias Populares</PageSectionTitle>
+        </PageSectionContent>
+        <PageSectionScroller>
+          {popularBarbershops.map((barbershop) => (
+            <BarbershopItem key={barbershop.id} barbershop={barbershop} />
+          ))}
+        </PageSectionScroller>
+      </PageContainer>
     </div>
   );
 }
