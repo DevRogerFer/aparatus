@@ -1,7 +1,12 @@
+"use client";
+
 import { CalendarDays, Home, LogIn, LogOut, MenuIcon } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
-import { Avatar, AvatarImage } from "./ui/avatar";
+import { authClient } from "@/lib/auth-client";
+
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
   Sheet,
@@ -21,8 +26,24 @@ const categories = [
 ];
 
 const MenuSheet = () => {
-  const isLoggedIn = false;
-
+  const { data: session } = authClient.useSession();
+  const handleLogin = async () => {
+    const { error } = await authClient.signIn.social({
+      provider: "google",
+    });
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+  };
+  const handleLogout = async () => {
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+  };
+  const isLoggedIn = !!session?.user;
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -38,14 +59,20 @@ const MenuSheet = () => {
         <div className="flex flex-col gap-2 px-5 py-6">
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&h=80&fit=crop" />
+              <Avatar className="size-12">
+                <AvatarImage
+                  src={session.user.image ?? ""}
+                  alt={session.user.name}
+                />
+                <AvatarFallback>
+                  {session.user.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
               </Avatar>
-              <div>
-                <p className="text-foreground font-semibold">Pedro Lucas</p>
-                <p className="text-muted-foreground text-xs">
-                  pedrolucas@gmail.com
-                </p>
+              <div className="flex flex-col">
+                <span className="font-semibold">{session.user.name}</span>
+                <span className="text-muted-foreground text-sm">
+                  {session.user.email}
+                </span>
               </div>
             </div>
           ) : (
@@ -53,7 +80,7 @@ const MenuSheet = () => {
               <p className="text-foreground font-semibold">
                 Olá. Faça seu login!
               </p>
-              <Button className="rounded-full">
+              <Button className="rounded-full" onClick={handleLogin}>
                 Login
                 <LogIn className="size-4" />
               </Button>
@@ -92,13 +119,16 @@ const MenuSheet = () => {
         </div>
 
         <div className="flex flex-col gap-1 py-6">
-          <Button
-            variant="ghost"
-            className="text-muted-foreground justify-start gap-3"
-          >
-            <LogOut className="size-4" />
-            Sair da conta
-          </Button>
+          {isLoggedIn && (
+            <Button
+              variant="ghost"
+              className="justify-left w-fit text-left"
+              onClick={handleLogout}
+            >
+              <LogOut className="size-4" />
+              Sair da conta
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
