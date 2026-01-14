@@ -33,6 +33,7 @@ Tecnologias utilizadas:
 - Antes de inserir o footer, veja os arquivos layout.tsx, se ele já não está sendo renderizado.
 - SEMPRE corrija os erros de ESLint.
 - NUNCA crie manualmente o botão de fechar do Sheet. Ele já vem automaticamente no Sheet.
+- Seja 100% fiel ao Figma **CUSTE O QUE CUSTAR**.
 
 ## Server Actions
 
