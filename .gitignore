@@ -40,4 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# vscode mcp config (contains sensitive tokens)
+.vscode/mcp.json
+
 /generated/prisma
