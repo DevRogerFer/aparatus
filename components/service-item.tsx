@@ -1,9 +1,13 @@
 "use client";
 
 import { ptBR } from "date-fns/locale";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useAction } from "next-safe-action/hooks";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
+import { createBooking } from "@/actions/create-booking";
 import { Barbershop, BarbershopService } from "@/generated/prisma/browser";
 import { formatPrice } from "@/lib/utils";
 
@@ -46,8 +50,12 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
   );
-  const [displayedMonth, setDisplayedMonth] = useState<Date>(new Date());
 
+  const [sheetIsOpen, setSheetIsOpen] = useState(false);
+  const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
+    useAction(createBooking);
+
+  const [displayedMonth, setDisplayedMonth] = useState<Date>(new Date());
   const handleDaySelect = (day: Date | undefined) => {
     setSelectedDay(day);
     setSelectedTime(undefined);
@@ -80,6 +88,33 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
   const showTimeSlots = isSelectedDayValid && isSelectedDayInDisplayedMonth;
 
+  const handleConfirmBooking = async () => {
+    if (!selectedDay || !selectedTime) {
+      return;
+    }
+    const splittedTime = selectedTime.split(":");
+    const hours = Number(splittedTime[0]);
+    const minutes = Number(splittedTime[1]);
+    const date = new Date(selectedDay);
+    date.setHours(hours, minutes);
+    const result = await executeCreateBooking({
+      date,
+      serviceId: service.id,
+    });
+    if (result.validationErrors) {
+      return toast.error(result.validationErrors._errors?.[0]);
+    }
+    if (result.serverError) {
+      return toast.error(
+        "Erro ao criar agendamento. Por favor, tente novamente.",
+      );
+    }
+    toast.success("Agendamento criado com sucesso!");
+    setSheetIsOpen(false);
+    setSelectedDay(undefined);
+    setSelectedTime(undefined);
+  };
+
   const selectedDateTime = useMemo(() => {
     if (!selectedDay || !selectedTime) return null;
 
@@ -109,7 +144,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
           <span className="text-primary text-sm font-bold">
             {formatPrice(service.priceInCents)}
           </span>
-          <Sheet>
+          <Sheet open={sheetIsOpen} onOpenChange={setSheetIsOpen}>
             <SheetTrigger asChild>
               <Button
                 size="sm"
@@ -208,10 +243,15 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
 
               <SheetFooter className="px-5">
                 <Button
-                  disabled={!selectedDay || !selectedTime}
+                  disabled={!selectedDay || !selectedTime || isCreatingBooking}
                   className="w-full"
+                  onClick={handleConfirmBooking}
                 >
-                  Confirmar
+                  {isCreatingBooking ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    "Confirmar"
+                  )}
                 </Button>
               </SheetFooter>
             </SheetContent>
