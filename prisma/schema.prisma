@@ -25,6 +25,21 @@ model BarbershopService {
   priceInCents Int
   imageUrl     String
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+}
+
+model Booking {
+  id        String            @id @default(uuid())
+  userId    String
+  serviceId String
+  date      DateTime
+  createdAt DateTime          @default(now())
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service   BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([serviceId])
+  @@map("booking")
 }
 
 model User {
@@ -37,6 +52,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  bookings      Booking[]
 
   @@unique([email])
   @@map("user")
