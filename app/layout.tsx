@@ -5,6 +5,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 import Footer from "@/components/ui/footer";
 import { Toaster } from "@/components/ui/sonner";
+import { TanstackQueryProvider } from "@/providers/tanstack-query";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -24,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${plusJakartaSans.variable} antialiased`}>
-        {children}
-        <Footer />
-        <Toaster />
+        <TanstackQueryProvider>
+          {children}
+          <Footer />
+          <Toaster />
+        </TanstackQueryProvider>
       </body>
     </html>
   );

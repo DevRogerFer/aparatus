@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { ptBR } from "date-fns/locale";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -8,7 +9,10 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { createBooking } from "@/actions/create-booking";
+import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
+import { queryKeys } from "@/constants/query-keys";
 import { Barbershop, BarbershopService } from "@/generated/prisma/browser";
+import { useGetDateAvailableTimeSlots } from "@/hooks/data/useGetDateAvailableTimeSlots";
 import { formatPrice } from "@/lib/utils";
 
 import { Button } from "./ui/button";
@@ -25,25 +29,8 @@ import {
 
 interface ServiceItemProps {
   service: BarbershopService;
-  barbershop: Pick<Barbershop, "name">;
+  barbershop: Barbershop;
 }
-
-const TIME_SLOTS = (() => {
-  const slots: string[] = [];
-  let minutes = 9 * 60;
-  const endMinutes = 18 * 60;
-
-  while (minutes <= endMinutes) {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    slots.push(
-      `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}`,
-    );
-    minutes += 45;
-  }
-
-  return slots;
-})();
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
@@ -54,6 +41,14 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
   const [sheetIsOpen, setSheetIsOpen] = useState(false);
   const { executeAsync: executeCreateBooking, isPending: isCreatingBooking } =
     useAction(createBooking);
+
+  const { data: availableTimeSlotsResult, isLoading: isLoadingTimeSlots } =
+    useGetDateAvailableTimeSlots({
+      barbershopId: barbershop.id,
+      date: selectedDay,
+    });
+
+  const availableTimeSlots = availableTimeSlotsResult?.data ?? [];
 
   const [displayedMonth, setDisplayedMonth] = useState<Date>(new Date());
   const handleDaySelect = (day: Date | undefined) => {
@@ -178,19 +173,29 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     <div className="border-border mt-5 border-b" />
 
                     <div className="flex gap-3 overflow-x-auto px-5 py-5 [&::-webkit-scrollbar]:hidden">
-                      {TIME_SLOTS.map((time) => (
-                        <Button
-                          key={time}
-                          variant={
-                            selectedTime === time ? "default" : "outline"
-                          }
-                          size="sm"
-                          className="rounded-full"
-                          onClick={() => handleTimeSelect(time)}
-                        >
-                          {time}
-                        </Button>
-                      ))}
+                      {isLoadingTimeSlots ? (
+                        <div className="flex w-full items-center justify-center">
+                          <Loader2 className="size-4 animate-spin" />
+                        </div>
+                      ) : availableTimeSlots.length > 0 ? (
+                        availableTimeSlots.map((time) => (
+                          <Button
+                            key={time}
+                            variant={
+                              selectedTime === time ? "default" : "outline"
+                            }
+                            size="sm"
+                            className="rounded-full"
+                            onClick={() => handleTimeSelect(time)}
+                          >
+                            {time}
+                          </Button>
+                        ))
+                      ) : (
+                        <p className="text-muted-foreground w-full text-center text-sm">
+                          Nenhum horário disponível para esta data.
+                        </p>
+                      )}
                     </div>
                   </>
                 )}
