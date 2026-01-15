@@ -26,16 +26,19 @@ model BarbershopService {
   imageUrl     String
   barbershop   Barbershop @relation(fields: [barbershopId], references: [id], onDelete: Cascade)
   bookings     Booking[]
+  deletedAt    DateTime?
 }
 
 model Booking {
-  id        String            @id @default(uuid())
-  userId    String
-  serviceId String
-  date      DateTime
-  createdAt DateTime          @default(now())
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  service   BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  id          String            @id @default(uuid())
+  serviceId   String
+  service     BarbershopService @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime
+  cancelledAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 
   @@index([userId])
   @@index([serviceId])
