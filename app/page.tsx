@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import Image from "next/image";
 
 import BarbershopItem from "@/components/barbershop-item";
@@ -12,13 +13,20 @@ import {
 import QuickSearch from "@/components/ui/quick-search";
 import Search from "@/components/ui/search";
 import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
+import { getUserNextBooking } from "@/data/booking";
+import { auth } from "@/lib/auth";
 import banner from "@/public/banner.png";
 
 // Server Component
 export default async function Home() {
-  // pega todas as barbearias cadastradas
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();
+  const nextBooking = session?.user
+    ? await getUserNextBooking(session.user.id)
+    : null;
   return (
     <div>
       <Header />
@@ -32,9 +40,14 @@ export default async function Home() {
           className="h-auto w-full"
         />
         <PageSectionContent>
-          {/* Composition Pattern */}
           <PageSectionTitle>Agendamentos</PageSectionTitle>
-          <BookingItem />
+          {nextBooking ? (
+            <BookingItem booking={nextBooking} />
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              Você não possui agendamentos.
+            </p>
+          )}
         </PageSectionContent>
 
         <PageSectionContent>

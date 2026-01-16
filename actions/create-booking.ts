@@ -1,11 +1,9 @@
-"use server"; // don't forget to add this!
+"use server";
 
-import { headers } from "next/headers";
 import { returnValidationErrors } from "next-safe-action";
 import { z } from "zod";
 
-import { actionClient } from "@/lib/action-client";
-import { auth } from "@/lib/auth";
+import { authActionClient } from "@/lib/action-client";
 import { prisma } from "@/lib/prisma";
 
 // This schema is used to validate input from client.
@@ -14,18 +12,9 @@ const inputSchema = z.object({
   date: z.date(),
 });
 
-export const createBooking = actionClient
+export const createBooking = authActionClient
   .inputSchema(inputSchema)
-  .action(async ({ parsedInput: { serviceId, date } }) => {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-    // Usuário está logado?
-    if (!session?.user) {
-      returnValidationErrors(inputSchema, {
-        _errors: ["Não autorizado. Por favor, faça login para continuar."],
-      });
-    }
+  .action(async ({ parsedInput: { serviceId, date }, ctx: { userId } }) => {
     const service = await prisma.barbershopService.findUnique({
       where: {
         id: serviceId,
@@ -55,7 +44,7 @@ export const createBooking = actionClient
       data: {
         serviceId,
         date: date.toISOString(),
-        userId: session.user.id,
+        userId,
         barbershopId: service.barbershopId,
       },
     });

@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { ptBR } from "date-fns/locale";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
@@ -9,8 +8,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { createBooking } from "@/actions/create-booking";
-import { getDateAvailableTimeSlots } from "@/actions/get-date-available-time-slots";
-import { queryKeys } from "@/constants/query-keys";
 import { Barbershop, BarbershopService } from "@/generated/prisma/browser";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/useGetDateAvailableTimeSlots";
 import { formatPrice } from "@/lib/utils";
