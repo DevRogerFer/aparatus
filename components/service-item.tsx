@@ -12,6 +12,7 @@ import { Barbershop, BarbershopService } from "@/generated/prisma/browser";
 import { useGetDateAvailableTimeSlots } from "@/hooks/data/useGetDateAvailableTimeSlots";
 import { formatPrice } from "@/lib/utils";
 
+import BookingSummary from "./booking-summary";
 import { Button } from "./ui/button";
 import { Calendar } from "./ui/calendar";
 import { Card, CardContent } from "./ui/card";
@@ -202,42 +203,12 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
                     <div className="border-border border-b" />
 
                     <div className="px-5 pt-5">
-                      <Card className="bg-card">
-                        <CardContent className="flex flex-col gap-3 p-3">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-bold">{service.name}</h3>
-                            <span className="text-sm font-bold">
-                              {formatPrice(service.priceInCents)}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground text-sm">
-                              Data
-                            </span>
-                            <span className="text-sm">
-                              {selectedDateTime.toLocaleDateString("pt-BR", {
-                                day: "2-digit",
-                                month: "long",
-                              })}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground text-sm">
-                              Horário
-                            </span>
-                            <span className="text-sm">{selectedTime}</span>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground text-sm">
-                              Barbearia
-                            </span>
-                            <span className="text-sm">{barbershop.name}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <BookingSummary
+                        serviceName={service.name}
+                        priceInCents={service.priceInCents}
+                        barbershopName={barbershop.name}
+                        date={selectedDateTime}
+                      />
                     </div>
                   </>
                 )}
