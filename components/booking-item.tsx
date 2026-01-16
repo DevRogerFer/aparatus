@@ -20,7 +20,7 @@ const BookingItem = ({ booking }: BookingItemProps) => {
 
   return (
     <BookingSheet booking={booking}>
-      <Card className="flex h-full w-full cursor-pointer flex-row items-center justify-between p-0">
+      <Card className="flex h-full min-w-full cursor-pointer flex-row items-center justify-between p-0">
         <div className="flex flex-1 flex-col gap-4 p-4">
           <Badge variant={variant}>{label}</Badge>
           <div className="flex flex-col gap-2">

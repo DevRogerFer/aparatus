@@ -13,7 +13,7 @@ import {
 import QuickSearch from "@/components/ui/quick-search";
 import Search from "@/components/ui/search";
 import { getBarbershops, getPopularBarbershops } from "@/data/barbershops";
-import { getUserNextBooking } from "@/data/booking";
+import { getUserConfirmedBookings } from "@/data/booking";
 import { auth } from "@/lib/auth";
 import banner from "@/public/banner.png";
 
@@ -24,9 +24,9 @@ export default async function Home() {
   });
   const barbershops = await getBarbershops();
   const popularBarbershops = await getPopularBarbershops();
-  const nextBooking = session?.user
-    ? await getUserNextBooking(session.user.id)
-    : null;
+  const confirmedBookings = session?.user
+    ? await getUserConfirmedBookings(session.user.id)
+    : [];
   return (
     <div>
       <Header />
@@ -41,8 +41,12 @@ export default async function Home() {
         />
         <PageSectionContent>
           <PageSectionTitle>Agendamentos</PageSectionTitle>
-          {nextBooking ? (
-            <BookingItem booking={nextBooking} />
+          {confirmedBookings.length > 0 ? (
+            <PageSectionScroller>
+              {confirmedBookings.map((booking) => (
+                <BookingItem key={booking.id} booking={booking} />
+              ))}
+            </PageSectionScroller>
           ) : (
             <p className="text-muted-foreground text-sm">
               Você não possui agendamentos.

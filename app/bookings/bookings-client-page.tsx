@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import BookingItem from "@/components/booking-item";
 import Header from "@/components/header";
-import Footer from "@/components/ui/footer";
 import {
   PageContainer,
   PageSectionContent,
@@ -84,9 +83,6 @@ const BookingsClientPage = ({
           <h2 className="text-xl font-bold">Agendamentos</h2>
           <p className="text-muted-foreground text-sm">Carregando...</p>
         </PageContainer>
-        <div className="mt-auto">
-          <Footer />
-        </div>
       </div>
     );
   }
@@ -101,9 +97,6 @@ const BookingsClientPage = ({
             Redirecionando para login...
           </p>
         </PageContainer>
-        <div className="mt-auto">
-          <Footer />
-        </div>
       </div>
     );
   }
@@ -115,9 +108,6 @@ const BookingsClientPage = ({
         <h2 className="text-xl font-bold">Agendamentos</h2>
         <BookingsPageContent confirmed={confirmed} finished={finished} />
       </PageContainer>
-      <div className="mt-auto">
-        <Footer />
-      </div>
     </div>
   );
 };

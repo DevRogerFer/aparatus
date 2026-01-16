@@ -3,6 +3,7 @@
 import { ptBR } from "date-fns/locale";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useAction } from "next-safe-action/hooks";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ interface ServiceItemProps {
 }
 
 const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
+  const router = useRouter();
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [selectedTime, setSelectedTime] = useState<string | undefined>(
     undefined,
@@ -106,6 +108,7 @@ const ServiceItem = ({ service, barbershop }: ServiceItemProps) => {
     setSheetIsOpen(false);
     setSelectedDay(undefined);
     setSelectedTime(undefined);
+    router.refresh();
   };
 
   const selectedDateTime = useMemo(() => {

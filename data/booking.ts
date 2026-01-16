@@ -53,6 +53,32 @@ export const getUserNextBooking = async (userId: string) => {
   return nextBooking;
 };
 
+export const getUserConfirmedBookings = async (userId: string) => {
+  const now = new Date();
+
+  const confirmedBookings = await prisma.booking.findMany({
+    where: {
+      userId,
+      cancelledAt: null,
+      date: {
+        gte: now,
+      },
+    },
+    include: {
+      service: {
+        include: {
+          barbershop: true,
+        },
+      },
+    },
+    orderBy: {
+      date: "asc",
+    },
+  });
+
+  return confirmedBookings;
+};
+
 export type BookingWithServiceAndBarbershop = Awaited<
   ReturnType<typeof getUserBookings>
 >["confirmed"][number];
