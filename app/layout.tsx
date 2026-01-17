@@ -1,7 +1,7 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Merriweather, Plus_Jakarta_Sans } from "next/font/google";
 
 import Footer from "@/components/ui/footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,6 +10,13 @@ import { TanstackQueryProvider } from "@/providers/tanstack-query";
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
+});
+
+const merriweather = Merriweather({
+  variable: "--font-merriweather",
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +31,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.variable} antialiased`}>
+      <body
+        className={`${plusJakartaSans.variable} ${merriweather.variable} antialiased`}
+      >
         <TanstackQueryProvider>
           {children}
           <Footer />

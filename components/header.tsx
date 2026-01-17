@@ -1,3 +1,4 @@
+import { MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -14,7 +15,16 @@ const Header = () => {
           height={24}
         />
       </Link>
-      <MenuSheet />
+      <div className="flex items-center gap-2">
+        <Link
+          href="/chat"
+          aria-label="Abrir chat de IA"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 flex h-10 w-10 items-center justify-center rounded-md shadow transition-all"
+        >
+          <MessageCircle className="size-5" />
+        </Link>
+        <MenuSheet />
+      </div>
     </header>
   );
 };

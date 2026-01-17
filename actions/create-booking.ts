@@ -33,6 +33,7 @@ export const createBooking = authActionClient
       where: {
         barbershopId: service.barbershopId,
         date,
+        cancelledAt: null,
       },
     });
     if (existingBooking) {
