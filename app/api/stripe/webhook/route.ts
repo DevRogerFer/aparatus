@@ -41,12 +41,37 @@ export const POST = async (request: Request) => {
     const session = event.data.object;
     const metadata = metadataSchema.parse(session.metadata);
     const date = new Date(metadata.date);
+    const expandedSession = await stripe.checkout.sessions.retrieve(
+      session.id,
+      {
+        expand: ["payment_intent"],
+      },
+    );
+    const paymentIntent =
+      expandedSession.payment_intent as Stripe.PaymentIntent;
+    const chargeId =
+      typeof paymentIntent.latest_charge === "string"
+        ? paymentIntent.latest_charge
+        : paymentIntent.latest_charge?.id;
+
+    // Verifica se já existe um booking para esta sessão (idempotência)
+    if (chargeId) {
+      const existingBooking = await prisma.booking.findFirst({
+        where: { stripeChargeId: chargeId },
+      });
+      if (existingBooking) {
+        console.log("Booking already exists for chargeId:", chargeId);
+        return NextResponse.json({ received: true });
+      }
+    }
+
     await prisma.booking.create({
       data: {
         userId: metadata.userId,
         barbershopId: metadata.barbershopId,
         serviceId: metadata.serviceId,
         date: date,
+        stripeChargeId: chargeId,
       },
     });
   }
