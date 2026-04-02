@@ -52,11 +52,20 @@ export const createBookingCheckoutSession = authActionClient
         _errors: ["Data e hora selecionadas já estão agendadas."],
       });
     }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
+    if (!baseUrl) {
+      return returnValidationErrors(inputSchema, {
+        _errors: ["URL da aplicação não configurada."],
+      });
+    }
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
+      //success_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
+      //cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}`,
+      success_url: `${baseUrl}/bookings?payment=success`,
+      cancel_url: `${baseUrl}/chat?payment=cancelled`,
       metadata: {
         serviceId: service.id,
         barbershopId: service.barbershopId,

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 
 import BookingItem from "@/components/booking-item";
@@ -67,6 +68,11 @@ const BookingsClientPage = ({
   finished,
 }: BookingsClientPageProps) => {
   const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const paymentSuccess = searchParams.get("payment") === "success";
+  const retriesRef = useRef(0);
+  const maxRetries = 5;
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -74,6 +80,35 @@ const BookingsClientPage = ({
       authClient.signIn.social({ provider: "google" });
     }
   }, [session, isPending]);
+
+  // Quando redirecionado do Stripe com ?payment=success, faz polling
+  // até o webhook criar o booking e os dados aparecerem na página
+  const previousConfirmedCount = useRef(confirmed.length);
+  useEffect(() => {
+    if (!paymentSuccess) return;
+
+    // Se já apareceu um novo booking, limpa a URL e para
+    if (confirmed.length > previousConfirmedCount.current) {
+      toast.success("Agendamento confirmado com sucesso!");
+      router.replace("/bookings");
+      return;
+    }
+
+    if (retriesRef.current >= maxRetries) {
+      toast.success(
+        "Pagamento confirmado! Seu agendamento aparecerá em breve.",
+      );
+      router.replace("/bookings");
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      retriesRef.current += 1;
+      router.refresh();
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [paymentSuccess, confirmed.length, router]);
 
   if (isPending) {
     return (
