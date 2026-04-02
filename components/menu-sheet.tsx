@@ -63,6 +63,7 @@ const MenuSheet = () => {
                 <AvatarImage
                   src={session.user.image ?? ""}
                   alt={session.user.name}
+                  referrerPolicy="no-referrer"
                 />
                 <AvatarFallback>
                   {session.user.name.charAt(0).toUpperCase()}
