@@ -75,11 +75,11 @@ const BookingsClientPage = ({
   const maxRetries = 5;
 
   useEffect(() => {
-    if (!isPending && !session) {
+    if (!isPending && !session && !paymentSuccess) {
       toast.error("Não autorizado. Por favor, faça login para continuar.");
       authClient.signIn.social({ provider: "google" });
     }
-  }, [session, isPending]);
+  }, [session, isPending, paymentSuccess]);
 
   // Quando redirecionado do Stripe com ?payment=success, faz polling
   // até o webhook criar o booking e os dados aparecerem na página
